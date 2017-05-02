@@ -20,6 +20,7 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
@@ -30,7 +31,7 @@ Pilot
 ============
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/pilot/LICENSE)
-[![Gem](https://img.shields.io/gem/v/pilot.svg?style=flat)](http://rubygems.org/gems/pilot)
+[![Gem](https://img.shields.io/gem/v/pilot.svg?style=flat)](https://rubygems.org/gems/pilot)
 
 
 ###### The best way to manage your TestFlight testers and builds from your terminal
@@ -47,6 +48,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 `pilot` uses [spaceship.airforce](https://spaceship.airforce) to interact with iTunes Connect :rocket:
 
 -------
+
 <p align="center">
     <a href="#installation">Installation</a> &bull;
     <a href="#usage">Usage</a> &bull;
@@ -60,7 +62,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 # Installation
 
-    sudo gem install pilot
+    sudo gem install fastlane
 
 # Usage
 
@@ -71,7 +73,7 @@ For all commands you can specify the Apple ID to use using `-u felix@krausefx.co
 To upload a new build, just run
 
 ```
-pilot upload
+fastlane pilot upload
 ```
 
 This will automatically look for an `ipa` in your current directory and tries to fetch the login credentials from your [fastlane setup](https://fastlane.tools).
@@ -79,19 +81,19 @@ This will automatically look for an `ipa` in your current directory and tries to
 You'll be asked for any missing information. Additionally, you can pass all kinds of parameters:
 
 ```
-pilot --help
+fastlane pilot --help
 ```
 
 You can pass a changelog using
 
 ```
-pilot upload --changelog "Something that is new here"
+fastlane pilot upload --changelog "Something that is new here"
 ```
 
 You can also skip the submission of the binary, which means, the `ipa` file will only be uploaded and not distributed to testers:
 
 ```
-pilot upload --skip_submission
+fastlane pilot upload --skip_submission
 ```
 
 `pilot` does all kinds of magic for you:
@@ -99,14 +101,14 @@ pilot upload --skip_submission
 - Automatically detects the bundle identifier from your `ipa` file
 - Automatically fetch the AppID of your app based on the bundle identifier
 
-`pilot` uses [spaceship](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary.
+`pilot` uses [spaceship](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary. Because iTunes Transporter's upload capability is only supported on OS X, `pilot upload` does not work on Linux, as described [in this issue](https://github.com/fastlane/fastlane/issues/5789)
 
 ## List builds
 
 To list all builds for specific application use
 
 ```
-pilot builds
+fastlane pilot builds
 ```
 
 The result lists all active builds and processing builds:
@@ -131,7 +133,7 @@ The result lists all active builds and processing builds:
 This command will list all your testers, both internal and external.
 
 ```
-pilot list
+fastlane pilot list
 ```
 
 The output will look like this:
@@ -160,13 +162,13 @@ The output will look like this:
 To add a new tester to both your iTunes Connect account and to your app (if given), use the `pilot add` command. This will create a new tester (if necessary) or add an existing tester to the app to test.
 
 ```
-pilot add email@invite.com
+fastlane pilot add email@invite.com
 ```
 
 Additionally you can specify the app identifier (if necessary):
 
 ```
-pilot add email@email.com -a com.krausefx.app
+fastlane pilot add email@email.com -a com.krausefx.app
 ```
 
 ### Find a tester
@@ -174,7 +176,7 @@ pilot add email@email.com -a com.krausefx.app
 To find a specific tester use
 
 ```
-pilot find felix@krausefx.com
+fastlane pilot find felix@krausefx.com
 ```
 
 The resulting output will look like this:
@@ -198,7 +200,7 @@ The resulting output will look like this:
 This command will only remove external beta testers.
 
 ```
-pilot remove felix@krausefx.com
+fastlane pilot remove felix@krausefx.com
 ```
 
 ### Export testers
@@ -206,7 +208,7 @@ pilot remove felix@krausefx.com
 To export all external testers to a CSV file. Useful if you need to import tester info to another system or a new account.
 
 ```
-pilot export
+fastlane pilot export
 ```
 
 ### Import testers
@@ -214,14 +216,14 @@ pilot export
 Add external testers from a CSV file. Sample CSV file available [here](https://itunesconnect.apple.com/itc/docs/tester_import.csv).
 
 ```
-pilot import
+fastlane pilot import
 ```
 
 You can also specify the directory using
 
 ```
-pilot export -c ~/Desktop/testers.csv
-pilot import -c ~/Desktop/testers.csv
+fastlane pilot export -c ~/Desktop/testers.csv
+fastlane pilot import -c ~/Desktop/testers.csv
  ```
 
 # Tips
@@ -242,13 +244,13 @@ pilot import -c ~/Desktop/testers.csv
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Debug information
 
 If you run into any issues you can use the `verbose` mode to get a more detailed output:
 
-    pilot --verbose
+    fastlane pilot upload --verbose
 
 ## Firewall Issues
 

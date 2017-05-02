@@ -11,15 +11,17 @@ module Gym
         clear_old_files
         build_app
       end
-      verify_archive if Gym.project.produces_archive?
+      verify_archive
       FileUtils.mkdir_p(File.expand_path(Gym.config[:output_directory]))
 
       if Gym.project.ios? || Gym.project.tvos?
         fix_generic_archive # See https://github.com/fastlane/fastlane/pull/4325
-        package_app if Gym.project.produces_archive?
+        return BuildCommandGenerator.archive_path if Gym.config[:skip_package_ipa]
+
+        package_app
         fix_package
         compress_and_move_dsym
-        path = move_ipa if Gym.project.produces_archive?
+        path = move_ipa
         move_manifest
         move_app_thinning
         move_app_thinning_size_report
@@ -32,14 +34,6 @@ module Gym
           return path
         end
         copy_files_from_path(File.join(BuildCommandGenerator.archive_path, "Products/usr/local/bin/*")) if Gym.project.command_line_tool?
-      end
-
-      if Gym.project.library? || Gym.project.framework?
-        base_framework_path = Gym.project.build_settings(key: "BUILD_ROOT")
-        base_framework_path = Gym.config[:derived_data_path] + "/Build/Products/" if Gym.config[:derived_data_path]
-
-        copy_files_from_path("#{base_framework_path}/*/*")
-        path = base_framework_path
       end
       path
     end
@@ -67,7 +61,7 @@ module Gym
       puts Terminal::Table.new(
         title: title.green,
         headings: ["Option", "Value"],
-        rows: rows.delete_if { |c| c.to_s.empty? }
+        rows: FastlaneCore::PrintTable.transform_output(rows.delete_if { |c| c.to_s.empty? })
       )
     end
 
@@ -85,7 +79,7 @@ module Gym
     end
 
     def fix_generic_archive
-      return if ENV["GYM_USE_GENERIC_ARCHIVE_FIX"].nil?
+      return unless FastlaneCore::Env.truthy?("GYM_USE_GENERIC_ARCHIVE_FIX")
       Gym::XcodebuildFixes.generic_archive_fix
     end
 
@@ -97,7 +91,6 @@ module Gym
     end
 
     def mark_archive_as_built_by_gym(archive_path)
-      return if Gym.project.library? || Gym.project.framework?
       escaped_archive_path = archive_path.shellescape
       system("xattr -w info.fastlane.generated_by_gym 1 #{escaped_archive_path}")
     end
@@ -105,7 +98,7 @@ module Gym
     # Builds the app and prepares the archive
     def build_app
       command = BuildCommandGenerator.generate
-      print_command(command, "Generated Build Command") if $verbose
+      print_command(command, "Generated Build Command") if FastlaneCore::Globals.verbose?
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: true,
                                       print_command: !Gym.config[:silent],
@@ -128,7 +121,7 @@ module Gym
 
     def package_app
       command = PackageCommandGenerator.generate
-      print_command(command, "Generated Package Command") if $verbose
+      print_command(command, "Generated Package Command") if FastlaneCore::Globals.verbose?
 
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: false,
@@ -177,7 +170,7 @@ module Gym
         # we have to remove it first, otherwise cp_r fails even with remove_destination
         # e.g.: there are symlinks in the .framework
         if File.exist?(existing_file)
-          UI.important "Removing #{File.basename(f)} from output directory" if $verbose
+          UI.important "Removing #{File.basename(f)} from output directory" if FastlaneCore::Globals.verbose?
           FileUtils.rm_rf(existing_file)
         end
         FileUtils.cp_r(f, File.expand_path(Gym.config[:output_directory]), remove_destination: true)

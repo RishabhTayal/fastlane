@@ -9,6 +9,7 @@ module Fastlane
     class ScanAction < Action
       def self.run(values)
         require 'scan'
+        plist_files_before = []
 
         begin
           destination = values[:destination] # save destination value which can be later overridden
@@ -16,8 +17,6 @@ module Fastlane
           unless values[:derived_data_path].to_s.empty?
             plist_files_before = test_summary_filenames(values[:derived_data_path])
           end
-
-          FastlaneCore::UpdateChecker.start_looking_for_update('scan') unless Helper.is_test?
 
           values[:destination] = destination # restore destination value
           Scan::Manager.new.work(values)
@@ -35,8 +34,6 @@ module Fastlane
             Actions.lane_context[SharedValues::SCAN_GENERATED_PLIST_FILES] = all_test_summaries
             Actions.lane_context[SharedValues::SCAN_GENERATED_PLIST_FILE] = all_test_summaries.last
           end
-
-          FastlaneCore::UpdateChecker.show_update_status('scan', Scan::VERSION)
         end
       end
 
@@ -81,6 +78,20 @@ module Fastlane
             workspace: "App.xcworkspace",
             scheme: "MyTests",
             clean: false
+          )',
+          '#Build For Testing
+           scan(
+             derived_data_path: "my_folder",
+             build_for_testing: true
+          )',
+          '# run tests using derived data from prev. build
+           scan(
+             derived_data_path: "my_folder",
+             test_without_building: true
+          )',
+          '# or run it from an existing xctestrun package
+          scan(
+             xctestrun: "/path/to/mytests.xctestrun"
           )'
         ]
       end

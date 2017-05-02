@@ -1,19 +1,11 @@
 source "https://rubygems.org"
 
-# Needed for CI
-gem "danger", "~> 0.10"
+gem "xcode-install", ">= 2.0.10" # needed for running xcode-install related tests
 
-# Local fastlane, important to be included using `gemspec`, as this will
-# also include development dependencies
-gemspec path: File.join(Dir.pwd, "fastlane")
+gem "danger", ">= 4.2.1", "< 5.0.0"
+gem "danger-junit", ">= 0.7.3", "< 1.0.0"
 
-plugins_path = File.join(Dir.pwd, 'fastlane', 'fastlane', 'Pluginfile')
-eval(File.read(plugins_path), binding) if File.exist?(plugins_path)
+gemspec path: "."
 
-# Use the local copy of all tools
-require "fastlane/tools.rb"
-tools = Fastlane::TOOLS + [:fastlane_core, :credentials_manager]
-tools.each do |tool_name|
-  next if tool_name == :fastlane
-  gem tool_name.to_s, path: File.join(Dir.pwd, tool_name.to_s)
-end
+plugins_path = File.join(File.expand_path("..", __FILE__), 'fastlane', 'Pluginfile')
+eval_gemfile(plugins_path)

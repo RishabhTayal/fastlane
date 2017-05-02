@@ -20,6 +20,7 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
@@ -31,7 +32,7 @@ frameit
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/frameit/LICENSE)
-[![Gem](https://img.shields.io/gem/v/frameit.svg?style=flat)](http://rubygems.org/gems/frameit)
+[![Gem](https://img.shields.io/gem/v/frameit.svg?style=flat)](https://rubygems.org/gems/frameit)
 
 ###### Quickly put your screenshots into the right device frames
 
@@ -40,8 +41,8 @@ frameit
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
-
 -------
+
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -51,6 +52,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 </p>
 
 -------
+
 <h5 align="center"><code>frameit</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 
@@ -63,7 +65,7 @@ Put a gorgeous device frame around your iOS and macOS screenshots just by runnin
 
 The complete and updated list of supported devices and colors can be found [here](https://github.com/fastlane/frameit-frames/tree/gh-pages/latest)
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 Here is a nice gif, that shows ```frameit``` in action:
 
@@ -91,7 +93,7 @@ Make sure, you have the commandline tools installed
 
 Install the gem
 
-    sudo gem install frameit
+    sudo gem install fastlane
 
 The first time that ```frameit``` is executed the frames will be downloaded automatically. Originally the frames are coming from [Facebook frameset](http://facebook.design/devices) and they are kept on this repo: https://github.com/fastlane/frameit-frames
 
@@ -103,15 +105,15 @@ Why should you have to use Photoshop, just to add a frame around your screenshot
 
 Just navigate to your folder of screenshots and use the following command:
 
-    frameit
+    fastlane frameit
 
 To use the silver version of the frames:
 
-    frameit silver
+    fastlane frameit silver
 
 To download the latest frames
 
-    frameit download_frames
+    fastlane frameit download_frames
 
 When using `frameit` without titles on top, the screenshots will have the full resolution, which means they can't be uploaded to the App Store directly. They are supposed to be used for websites, print media and emails. Check out the section below to use the screenshots for the App Store.
 
@@ -138,7 +140,8 @@ Use it to define the general information:
     },
     "background": "./background.jpg",
     "padding": 50,
-    "show_complete_frame": false
+    "show_complete_frame": false,
+    "stack_title" : false
   },
 
   "data": [
@@ -169,6 +172,8 @@ Use it to define the general information:
   ]
 }
 ```
+The `stack_title` value specifies whether `frameit` should display the keyword above the title when both keyword and title are defined.
+
 The `show_complete_frame` value specifies whether `frameit` should shrink the device and frame so that they show in full in the framed screenshot. If it is false, then they can hang over the bottom of the screenshot.
 
 The `filter` value is a part of the screenshot named for which the given option should be used. If a screenshot is named `iPhone5_Brainstorming.png` the first entry in the `data` array will be used.
@@ -243,7 +248,7 @@ Check out the [MindNode example project](https://github.com/fastlane/examples/tr
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Generate localized screenshots
 Check out [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot) to automatically generate screenshots using ```UI Automation```.
@@ -254,7 +259,7 @@ Device frames can also be stored in a ```./fastlane/screenshots/devices_frames``
 
 ## White background of frames
 
-Some stock images provided by Apple still have a white background instead of a transparent one. You'll have to edit the Photoshop file to remove the white background, delete the generated `.png` file and run `frameit` again.
+Some stock images provided by Apple still have a white background instead of a transparent one. You'll have to edit the Photoshop file to remove the white background, delete the generated `.png` file and run `fastlane frameit` again.
 
 ## Use a clean status bar
 You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
@@ -269,7 +274,7 @@ brew install imagemagick
 ```
 
 ## Uninstall
-- ```sudo gem uninstall frameit```
+- ```sudo gem uninstall fastlane```
 - ```rm -rf ~/.frameit```
 
 # Need help?

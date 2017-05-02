@@ -20,6 +20,7 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
@@ -31,7 +32,7 @@ produce
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/produce/LICENSE)
-[![Gem](https://img.shields.io/gem/v/produce.svg?style=flat)](http://rubygems.org/gems/produce)
+[![Gem](https://img.shields.io/gem/v/produce.svg?style=flat)](https://rubygems.org/gems/produce)
 
 ###### Create new iOS apps on iTunes Connect and Dev Portal using your command line
 
@@ -40,6 +41,7 @@ produce
 Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
+
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -61,24 +63,25 @@ Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.
 - **Associate** apps with App Groups on the Apple Developer Portal
 - Support for **multiple Apple accounts**, storing your credentials securely in the Keychain
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Installation
-    sudo gem install produce
+
+    sudo gem install fastlane
 
 # Usage
 
 ## Creating a new application
 
-    produce
+    fastlane produce
 
 To get a list of all available parameters:
 
-    produce --help
+    fastlane produce --help
 
 ```
   Commands:
-    associate_group  Associate with a group, which is create if needed or simply located otherwise
+    associate_group  Associate with a group, which is created if needed or simply located otherwise
     create           Creates a new app on iTunes Connect and the Apple Developer Portal
     disable_services Disable specific Application Services for a specific app on the Apple Developer Portal
     enable_services  Enable specific Application Services for a specific app on the Apple Developer Portal
@@ -106,25 +109,25 @@ To get a list of all available parameters:
 
 If you want to enable Application Services for an App ID (HomeKit and HealthKit in this example):
 
-    produce enable_services --homekit --healthkit
+    fastlane produce enable_services --homekit --healthkit
 
 If you want to disable Application Services for an App ID (iCloud in this case):
 
-    produce disable_services --icloud
+    fastlane produce disable_services --icloud
 
 If you want to create a new App Group:
 
-    produce group -g group.krausefx -n "Example App Group"
+    fastlane produce group -g group.krausefx -n "Example App Group"
 
 If you want to associate an app with an App Group:
 
-    produce associate_group -a com.krausefx.app group.krausefx
+    fastlane produce associate_group -a com.krausefx.app group.krausefx
 
 # Parameters
 
 Get a list of all available options using
 
-    produce enable_services --help
+    fastlane produce enable_services --help
 
 ```
     --app-group          Enable App Groups
@@ -144,7 +147,7 @@ Get a list of all available options using
     --vpn-conf           Enable VPN Configuration
 ```
 
-    produce disable_services --help
+    fastlane produce disable_services --help
 
 ```
     --app-group          Disable App Groups
@@ -166,7 +169,7 @@ Get a list of all available options using
 
 ## Environment Variables
 
-All available values can also be passed using environment variables, run `produce --help` to get a list of all available parameters.
+All available values can also be passed using environment variables, run `fastlane produce --help` to get a list of all available parameters.
 
 ## [`fastlane`](https://github.com/fastlane/fastlane/tree/master/fastlane) Integration
 
@@ -217,7 +220,7 @@ You'll still have to fill out the remaining information (like screenshots, app d
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup

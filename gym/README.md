@@ -20,6 +20,7 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
@@ -31,13 +32,14 @@ gym
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/gym/LICENSE)
-[![Gem](https://img.shields.io/gem/v/gym.svg?style=flat)](http://rubygems.org/gems/gym)
+[![Gem](https://img.shields.io/gem/v/gym.svg?style=flat)](https://rubygems.org/gems/gym)
 
 ###### Building your app has never been easier
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
+
 <p align="center">
     <a href="#whats-gym">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -71,15 +73,15 @@ xcodebuild -exportArchive \
 ### With `gym`
 
 ```
-gym
+fastlane gym
 ```
 
 ### Why `gym`?
 
 `gym` uses the latest APIs to build and sign your application which results in much faster build times.
 
-              |  Gym Features
---------------------------|------------------------------------------------------------
+|          |  Gym Features  |
+|----------|----------------|
 :rocket:            | `gym` builds 30% faster than other build tools like [shenzhen](https://github.com/nomad/shenzhen)
 :checkered_flag: | Beautiful inline build output
 :book:     | Helps you resolve common build errors like code signing issues
@@ -100,7 +102,7 @@ gym
 
 # Installation
 
-    sudo gem install gym
+    sudo gem install fastlane
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
@@ -108,11 +110,11 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 # Usage
 
-    gym
+    fastlane gym
 
 That's all you need to build your application. If you want more control, here are some available parameters:
 
-    gym --workspace "Example.xcworkspace" --scheme "AppName" --clean
+    fastlane gym --workspace "Example.xcworkspace" --scheme "AppName" --clean
 
 If you need to use a different xcode install, use xcode-select or define DEVELOPER_DIR:
 
@@ -120,23 +122,19 @@ If you need to use a different xcode install, use xcode-select or define DEVELOP
 
 For a list of all available parameters use
 
-    gym --help
+    fastlane gym --help
 
 If you run into any issues, use the `verbose` mode to get more information
 
-    gym --verbose
-
-In general, if you run into issues while exporting the archive, try using:
-
-    gym --use_legacy_build_api
+    fastlane gym --verbose
 
 Set the right export method if you're not uploading to App Store or TestFlight:
 
-    gym --export_method ad-hoc
+    fastlane gym --export_method ad-hoc
 
 To pass boolean parameters make sure to use `gym` like this:
 
-    gym --include_bitcode true --include_symbols false
+    fastlane gym --include_bitcode true --include_symbols false
 
 To access the raw `xcodebuild` output open `~/Library/Logs/gym`
 
@@ -144,7 +142,7 @@ To access the raw `xcodebuild` output open `~/Library/Logs/gym`
 
 Since you might want to manually trigger a new build but don't want to specify all the parameters every time, you can store your defaults in a so called `Gymfile`.
 
-Run `gym init` to create a new configuration file. Example:
+Run `fastlane gym init` to create a new configuration file. Example:
 
 ```ruby
 scheme "Example"
@@ -196,7 +194,21 @@ lane :beta do
   gym(scheme: "MyApp")
   crashlytics
 end
+
+# error block is executed when a error occurs
+error do |lane, exception|
+  slack(
+    # message with short human friendly message
+    message: exception.to_s, 
+    success: false, 
+    # Output containing extended log output
+    payload: { "Output" => exception.error_info.to_s } 
+  )
+end
 ```
+
+When gym raises an error the `error_info` property will contain the process output
+in case you want to display the error in 3rd party tools such as Slack.
 
 You can then easily switch between the beta provider (e.g. `testflight`, `hockey`, `s3` and more).
 
@@ -271,7 +283,7 @@ Afterwards the `ipa` file is moved to the output folder. The `dSYM` file is comp
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).

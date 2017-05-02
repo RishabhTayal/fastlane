@@ -21,7 +21,7 @@ module Deliver
       UI.success("Successfully created new Deliverfile at path '#{file_path}'")
     end
 
-    # This method takes care of creating a new 'deliver' folder, containg the app metadata
+    # This method takes care of creating a new 'deliver' folder, containing the app metadata
     # and screenshots folders
     def generate_deliver_file(deliver_path, options)
       v = options[:app].latest_version
@@ -66,7 +66,32 @@ module Deliver
         UI.message("Writing to '#{resulting_path}'")
       end
 
+      # Review information
+      UploadMetadata::REVIEW_INFORMATION_VALUES.each do |key, option_name|
+        content = v.send(key).to_s
+        content << "\n"
+        base_dir = File.join(path, UploadMetadata::REVIEW_INFORMATION_DIR)
+        FileUtils.mkdir_p(base_dir)
+        resulting_path = File.join(base_dir, "#{option_name}.txt")
+        File.write(resulting_path, content)
+        UI.message("Writing to '#{resulting_path}'")
+      end
+
       UI.success("Successfully created new configuration files.")
+
+      # get App icon + watch icon
+      if v.large_app_icon.asset_token
+        app_icon_extension = File.extname(v.large_app_icon.url)
+        app_icon_path = File.join(path, "app_icon#{app_icon_extension}")
+        File.write(app_icon_path, open(v.large_app_icon.url).read)
+        UI.success("Successfully downloaded large app icon")
+      end
+      if v.watch_app_icon.asset_token
+        watch_app_icon_extension = File.extname(v.watch_app_icon.url)
+        watch_icon_path = File.join(path, "watch_icon#{watch_app_icon_extension}")
+        File.write(watch_icon_path, open(v.watch_app_icon.url).read)
+        UI.success("Successfully downloaded watch icon")
+      end
     end
 
     def download_screenshots(deliver_path, options)

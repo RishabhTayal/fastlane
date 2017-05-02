@@ -20,6 +20,7 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
@@ -31,7 +32,7 @@ cert
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/fastlanetools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/cert/LICENSE)
-[![Gem](https://img.shields.io/gem/v/cert.svg?style=flat)](http://rubygems.org/gems/cert)
+[![Gem](https://img.shields.io/gem/v/cert.svg?style=flat)](https://rubygems.org/gems/cert)
 
 ###### Automatically create and maintain iOS code signing certificates.
 
@@ -59,7 +60,7 @@ Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.
 
 **Note**: It is recommended to use [match](https://github.com/fastlane/fastlane/tree/master/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use `cert` directly only if you want full control over what's going on and know more about codesigning.
 
-    sudo gem install cert
+    sudo gem install fastlane
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
@@ -75,11 +76,11 @@ Please check out [this guide](https://github.com/fastlane/fastlane/blob/master/c
 
 In the gif I used `cert && sigh`, which will first create an iOS code signing certificate and then a provisioning profile for your app if `cert` succeeded.
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Usage
 
-    cert
+    fastlane cert
 
 This will check if any of the available signing certificates is installed on your local machine.
 
@@ -96,17 +97,17 @@ Only if a new certificate needs to be created, `cert` will
 
 You can pass your Apple ID:
 
-    cert -u cert@krausefx.com
+    fastlane cert -u cert@krausefx.com
 
 For a list of available commands run
 
-    cert --help
+    fastlane cert --help
 
 Keep in mind, there is no way for `cert` to download existing certificates + private keys from the Apple Developer Portal, as the private key never leaves your computer.
 
 ## Environment Variables
 
-Run `cert --help` to get a list of all available environment variables.
+Run `fastlane cert --help` to get a list of all available environment variables.
 
 ## Use with [`sigh`](https://github.com/fastlane/fastlane/tree/master/sigh)
 
@@ -146,7 +147,7 @@ This will result in `sigh` always using the correct signing certificate, which i
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning) to easily preview provisioning profile files and certificates.

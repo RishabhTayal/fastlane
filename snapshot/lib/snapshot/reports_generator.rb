@@ -27,7 +27,7 @@ module Snapshot
         end
       end
 
-      html_path = File.join(lib_path, "snapshot/page.html.erb")
+      html_path = File.join(Snapshot::ROOT, "lib", "snapshot/page.html.erb")
       html = ERB.new(File.read(html_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system
 
       export_path = "#{screens_path}/screenshots.html"
@@ -36,16 +36,6 @@ module Snapshot
       export_path = File.expand_path(export_path)
       UI.success "Successfully created HTML file with an overview of all the screenshots: '#{export_path}'"
       system("open '#{export_path}'") unless Snapshot.config[:skip_open_summary]
-    end
-
-    private
-
-    def lib_path
-      if !Helper.is_test? and Gem::Specification.find_all_by_name('snapshot').any?
-        return [Gem::Specification.find_by_name('snapshot').gem_dir, 'lib'].join('/')
-      else
-        return './lib'
-      end
     end
 
     def available_devices
@@ -61,9 +51,14 @@ module Snapshot
         'iPhone6' => "iPhone6 (4.7-Inch)",
         'iPhone5' => "iPhone5 (4-Inch)",
         'iPhone4' => "iPhone4 (3.5-Inch)",
+        'iPhoneSE' => "iPhone SE",
+        'iPad2' => "iPad2",
+        'iPadAir2' => 'iPad Air 2',
+        'iPadPro(12.9-inch)' => 'iPad Air Pro (12.9 inch)',
+        'iPadPro(9.7-inch)' => 'iPad Air Pro (9.7 inch)',
         'iPadPro(9.7inch)' => "iPad Pro (9.7 inch)",
         'iPadPro(12.9inch)' => "iPad Pro (12.9 inch)",
-        'iPad Pro' => "iPad Pro",
+        'iPadPro' => "iPad Pro",
         'iPad' => "iPad",
         'Mac' => "Mac"
       }

@@ -1,4 +1,5 @@
 # coding: utf-8
+
 module Gym
   # This classes methods are called when something goes wrong in the building process
   class ErrorHandler
@@ -53,7 +54,8 @@ module Gym
         print_full_log_path
         print_xcode_path_instructions
         print_xcode_version
-        UI.user_error!("Error building the application - see the log above")
+        raise_legacy_build_api_error(output) if Gym.config[:use_legacy_build_api]
+        UI.user_error!("Error building the application - see the log above", error_info: output)
       end
 
       # @param [Array] The output of the errored build (line by line)
@@ -82,27 +84,9 @@ module Gym
         when /Codesign check fails/
           print "A general code signing error occurred. Make sure you passed a valid"
           print "provisioning profile and code signing identity."
-        when /expected one of \{\}/
-          print "It seems like you ran into this radar"
-          print "https://openradar.appspot.com/radar?id=4952000420642816"
-          print "You can temporarily use the :use_legacy_build_api option to work around the issue:"
-          print "In your Fastfile:"
-          print "    gym(use_legacy_build_api: true)"
-          print "On the command line:"
-          print "    gym --use_legacy_build_api"
-        when /Error Domain=IDEDistributionErrorDomain Code=/, /IDEDistributionErrorDomain error 1/
-          standard_output = read_standard_output output
-          print standard_output if standard_output
-          print "There was an error exporting your application"
-          print "Unfortunately the new Xcode export API is unstable and causes problems on some projects"
-          print "You can temporarily use the :use_legacy_build_api option to work around the issue:"
-          print "In your Fastfile:"
-          print "    gym(use_legacy_build_api: true)"
-          print "On the command line:"
-          print "    gym --use_legacy_build_api"
         end
         print_full_log_path
-        UI.user_error!("Error packaging up the application")
+        UI.user_error!("Error packaging up the application", error_info: output)
       end
 
       def handle_empty_archive
@@ -118,6 +102,15 @@ module Gym
       def find_standard_output_path(output)
         m = /Created bundle at path '(.*)'/.match(output)
         return File.join(m[1], 'IDEDistribution.standard.log') unless m.nil?
+      end
+
+      def raise_legacy_build_api_error(output)
+        UI.error("You enabled the legacy build API in _gym_")
+        UI.error("This option has been deprecated for about a year")
+        UI.error("and was removed with Xcode 8.3")
+        UI.error("Please update your Fastfile to include the export_method too")
+        UI.error("more information about how to migrate away: https://github.com/fastlane/fastlane/releases/tag/2.24.0")
+        UI.user_error!("Build failed. Please remove the `use_legacy_build_api` option in your Fastfile and try again", error_info: output)
       end
 
       private
@@ -145,7 +138,7 @@ module Gym
         # sure they are aware of the Xcode version and SDK they're using
         values = {
           xcode_path: File.expand_path("../..", FastlaneCore::Helper.xcode_path),
-          gym_version: Gym::VERSION
+          gym_version: Fastlane::VERSION
         }
 
         sdk_path = Gym.project.build_settings(key: "SDKROOT")

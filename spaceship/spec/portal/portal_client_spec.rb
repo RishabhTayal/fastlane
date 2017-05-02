@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Client do
   before { Spaceship.login }
   subject { Spaceship.client }
@@ -41,7 +39,7 @@ describe Spaceship::Client do
       end
 
       it "shows a warning when user is in multiple teams and didn't call select_team" do
-        adp_stub_multiple_teams
+        PortalStubbing.adp_stub_multiple_teams
         expect(subject.team_id).to eq("SecondTeam")
       end
     end
@@ -51,7 +49,7 @@ describe Spaceship::Client do
         # Temporary stub a request to require the csrf_tokens
         stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
           with(body: { teamId: 'XXXXXXXXXX', pageSize: "10", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "false" }, headers: { 'csrf' => 'top_secret', 'csrf_ts' => '123123' }).
-          to_return(status: 200, body: adp_read_fixture_file('listDevices.action.json'), headers: { 'Content-Type' => 'application/json' })
+          to_return(status: 200, body: PortalStubbing.adp_read_fixture_file('listDevices.action.json'), headers: { 'Content-Type' => 'application/json' })
 
         # Hard code the tokens
         allow(subject).to receive(:csrf_tokens).and_return({ csrf: 'top_secret', csrf_ts: '123123' })
@@ -92,7 +90,7 @@ describe Spaceship::Client do
       end
 
       it 'returns true for enterprise accounts' do
-        adp_stub_multiple_teams
+        PortalStubbing.adp_stub_multiple_teams
 
         subject.team_id = 'SecondTeam'
         expect(subject.in_house?).to eq(true)
@@ -118,6 +116,14 @@ describe Spaceship::Client do
         response = subject.create_app!(:explicit, 'pp Test 1ed9e25c93ac7142ff9df53e7f80e84c', 'tools.fastlane.spaceship.some-explicit-app')
         expect(response['isWildCard']).to eq(false)
         expect(response['name']).to eq('pp Test 1ed9e25c93ac7142ff9df53e7f80e84c')
+        expect(response['identifier']).to eq('tools.fastlane.spaceship.some-explicit-app')
+      end
+
+      it 'should make a request create an explicit app id with no push feature' do
+        payload = {}
+        payload[Spaceship.app_service.push_notification.on.service_id] = Spaceship.app_service.push_notification.on
+        response = subject.create_app!(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app', enabled_features: payload)
+        expect(response['enabledFeatures']).to_not include("push")
         expect(response['identifier']).to eq('tools.fastlane.spaceship.some-explicit-app')
       end
     end
@@ -188,6 +194,45 @@ describe Spaceship::Client do
       end
     end
 
+    describe '#provisioning_profiles' do
+      it 'makes a call to the developer portal API' do
+        profiles = subject.provisioning_profiles
+        expect(profiles).to be_instance_of(Array)
+        expect(profiles.sample.keys).to include("provisioningProfileId",
+                                                "name",
+                                                "status",
+                                                "type",
+                                                "distributionMethod",
+                                                "proProPlatform",
+                                                "version",
+                                                "dateExpire",
+                                                "managingApp",
+                                                "deviceIds",
+                                                "certificateIds")
+        expect(a_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/profile/listProvisioningProfiles.action')).to have_been_made
+      end
+    end
+
+    describe '#provisioning_profiles_via_xcode_api' do
+      it 'makes a call to the developer portal API' do
+        profiles = subject.provisioning_profiles_via_xcode_api
+        expect(profiles).to be_instance_of(Array)
+        expect(profiles.sample.keys).to include("provisioningProfileId",
+                                                "name",
+                                                "status",
+                                                "type",
+                                                "distributionMethod",
+                                                "proProPlatform",
+                                                "version",
+                                                "dateExpire",
+                                                # "managingApp", not all profiles have it
+                                                "deviceIds",
+                                                "appId",
+                                                "certificateIds")
+        expect(a_request(:post, /developerservices2.apple.com/)).to have_been_made
+      end
+    end
+
     describe "#create_provisioning_profile" do
       it "works when the name is free" do
         response = subject.create_provisioning_profile!("net.sunapps.106 limited", "limited", 'R9YNDTPLJX', ['C8DL7464RQ'], ['C8DLAAAARQ'])
@@ -201,6 +246,12 @@ describe Spaceship::Client do
           response = subject.create_provisioning_profile!("taken", "limited", 'R9YNDTPLJX', ['C8DL7464RQ'], ['C8DLAAAARQ'])
         end.to raise_error(Spaceship::Client::UnexpectedResponse, error_text)
       end
+
+      it "works when subplatform is null and mac is false" do
+        response = subject.create_provisioning_profile!("net.sunapps.106 limited", "limited", 'R9YNDTPLJX', ['C8DL7464RQ'], ['C8DLAAAARQ'], mac: false, sub_platform: nil)
+        expect(response.keys).to include('name', 'status', 'type', 'appId', 'deviceIds')
+        expect(response['distributionMethod']).to eq('limited')
+      end
     end
 
     describe '#delete_provisioning_profile!' do
@@ -211,7 +262,7 @@ describe Spaceship::Client do
     end
 
     describe '#create_certificate' do
-      let(:csr) { adp_read_fixture_file('certificateSigningRequest.certSigningRequest') }
+      let(:csr) { PortalStubbing.adp_read_fixture_file('certificateSigningRequest.certSigningRequest') }
       it 'makes a request to create a certificate' do
         response = subject.create_certificate!('BKLRAVXMGM', csr, '2HNR359G63')
         expect(response.keys).to include('certificateId', 'certificateType', 'statusString', 'expirationDate', 'certificate')

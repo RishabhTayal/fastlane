@@ -46,7 +46,7 @@ module Fastlane
           UI.success('Successfully sent Slack notification')
         else
           UI.verbose(result)
-          UI.user_error!("Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile.")
+          UI.user_error!("Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile, this is usually caused by a misspelled or changed group/channel name or an expired SLACK_URL")
         end
       end
 
@@ -91,7 +91,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :payload,
                                        env_name: "FL_SLACK_PAYLOAD",
-                                       description: "Add additional information to this post. payload must be a hash containg any key with any value",
+                                       description: "Add additional information to this post. payload must be a hash containing any key with any value",
                                        default_value: {},
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :default_payloads,
@@ -206,7 +206,7 @@ module Fastlane
 
         # git_author
         if Actions.git_author_email && should_add_payload[:git_author]
-          if ENV['FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS'] && options[:success]
+          if FastlaneCore::Env.truthy?('FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS') && options[:success]
             # We only show the git author if the build failed
           else
             slack_attachment[:fields] << {
@@ -230,7 +230,7 @@ module Fastlane
         deep_merge(slack_attachment, options[:attachment_properties])
       end
 
-      # Adapted from http://stackoverflow.com/a/30225093/158525
+      # Adapted from https://stackoverflow.com/a/30225093/158525
       def self.deep_merge(a, b)
         merger = proc do |key, v1, v2|
           Hash === v1 && Hash === v2 ?

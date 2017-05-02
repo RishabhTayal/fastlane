@@ -1,4 +1,5 @@
 require 'commander'
+require 'fastlane/version'
 
 HighLine.track_eof = false
 
@@ -7,28 +8,25 @@ module Sigh
     include Commander::Methods
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('sigh')
       self.new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status('sigh', Sigh::VERSION)
     end
 
     def run
       program :name, 'sigh'
-      program :version, Sigh::VERSION
+      program :version, Fastlane::VERSION
       program :description, 'CLI for \'sigh\' - Because you would rather spend your time building stuff than fighting provisioning'
       program :help, 'Author', 'Felix Krause <sigh@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'GitHub', 'https://github.com/fastlane/sigh'
       program :help_formatter, :compact
 
-      global_option('--verbose') { $verbose = true }
-
-      FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options)
+      global_option('--verbose') { FastlaneCore::Globals.verbose = true }
 
       command :renew do |c|
-        c.syntax = 'sigh renew'
+        c.syntax = 'fastlane sigh renew'
         c.description = 'Renews the certificate (in case it expired) and outputs the path to the generated file'
+
+        FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options, command: c)
 
         c.action do |args, options|
           user_input = options.__hash__
@@ -59,8 +57,10 @@ module Sigh
       end
 
       command :download_all do |c|
-        c.syntax = 'sigh download_all'
+        c.syntax = 'fastlane sigh download_all'
         c.description = 'Downloads all valid provisioning profiles'
+
+        FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options, command: c)
 
         c.action do |args, options|
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options.__hash__)
@@ -69,8 +69,10 @@ module Sigh
       end
 
       command :repair do |c|
-        c.syntax = 'sigh repair'
+        c.syntax = 'fastlane sigh repair'
         c.description = 'Repairs all expired or invalid provisioning profiles'
+
+        FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options, command: c)
 
         c.action do |args, options|
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options.__hash__)
@@ -80,7 +82,7 @@ module Sigh
       end
 
       command :resign do |c|
-        c.syntax = 'sigh resign'
+        c.syntax = 'fastlane sigh resign'
         c.description = 'Resigns an existing ipa file with the given provisioning profile'
         c.option '-i', '--signing_identity STRING', String, 'The signing identity to use. Must match the one defined in the provisioning profile.'
         c.option '-x', '--version_number STRING', String, 'Version number to force binary and all nested binaries to use. Changes both CFBundleShortVersionString and CFBundleIdentifier.'
@@ -102,14 +104,14 @@ module Sigh
       end
 
       command :manage do |c|
-        c.syntax = 'sigh manage'
+        c.syntax = 'fastlane sigh manage'
         c.description = 'Manage installed provisioning profiles on your system.'
 
         c.option '-f', '--force', 'Force remove all expired provisioning profiles. Required on CI.'
         c.option '-e', '--clean_expired', 'Remove all expired provisioning profiles.'
 
         c.option '-p', '--clean_pattern STRING', String, 'Remove any provisioning profiles that matches the regular expression.'
-        c.example 'Remove all "iOS Team Provisioning" provisioning profiles', 'sigh manage -p "iOS\ ?Team Provisioning Profile"'
+        c.example 'Remove all "iOS Team Provisioning" provisioning profiles', 'fastlane sigh manage -p "iOS\ ?Team Provisioning Profile"'
 
         c.action do |args, options|
           Sigh::LocalManage.start(options, args)
