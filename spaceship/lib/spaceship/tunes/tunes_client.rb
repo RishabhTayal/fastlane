@@ -320,6 +320,16 @@ module Spaceship
       end
       data = parse_response(r, 'messages')['info']
     end
+
+    def delete_review_response(app_id, platform, review_id, response_id)
+      r = request(:delete) do |req|
+        req.url "ra/apps/#{app_id}/platforms/#{platform}/reviews/#{review_id}/responses/#{response_id}"
+        req.headers['Content-Type'] = 'application/json'  
+      end
+      puts r
+      data = parse_response(r, 'messages')['info']
+    end
+
     #####################################################
     # @!group AppVersions
     #####################################################

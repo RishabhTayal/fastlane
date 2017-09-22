@@ -52,6 +52,7 @@ module Spaceship
         end
       end
 
+      # POST developer response to itc
       def sendResponse(review_id, response_text)
         result = client.send_review_response(application.apple_id, application.platform, review_id, response_text)
       end
@@ -59,6 +60,12 @@ module Spaceship
       # TODO: Add 'edit response' API
 
       # TODO: Add 'delete response' API
+      # DELETE developer response from itc
+      def deleteResponse(review_id, response_id)
+        puts review_id
+        result = client.delete_review_response(application.apple_id, application.platform, review_id, response_id)
+      end
+
     end
 
     class DeveloperResponse < TunesBase
