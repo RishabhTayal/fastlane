@@ -192,6 +192,15 @@ module Spaceship
 
       def as_json(options={})
           {
+            platform: platform,
+            app_status: app_status
+          }
+      end
+
+      def to_json(*options)
+        as_json(*options).to_json(*options)
+      end
+
       def toggle_phased_release(enabled: false)
         state = (enabled ? "INACTIVE" : "NOT_STARTED")
 
