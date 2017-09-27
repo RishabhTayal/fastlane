@@ -12,6 +12,7 @@ module Precheck
         FutureFunctionalityRule,
         TestWordsRule,
         CurseWordsRule,
+        FreeStuffIAPRule,
         CustomTextRule,
         CopyrightDateRule,
         UnreachableURLRule
@@ -38,7 +39,7 @@ module Precheck
                                      env_name: "PRECHECK_TEAM_ID",
                                      description: "The ID of your iTunes Connect team if you're in multiple teams",
                                      optional: true,
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
                                      end),
@@ -47,7 +48,7 @@ module Precheck
                                      env_name: "PRECHECK_TEAM_NAME",
                                      description: "The name of your iTunes Connect team if you're in multiple teams",
                                      optional: true,
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                      end),
@@ -56,7 +57,14 @@ module Precheck
                                      env_name: "PRECHECK_DEFAULT_RULE_LEVEL",
                                      description: "The default rule level unless otherwise configured",
                                      is_string: false,
-                                     default_value: RULE_LEVELS[:error])
+                                     default_value: RULE_LEVELS[:error]),
+        FastlaneCore::ConfigItem.new(key: :include_in_app_purchases,
+                                     short_option: "-i",
+                                     env_name: "PRECHECK_INCLUDE_IN_APP_PURCHASES",
+                                     description: "Should check in-app purchases?",
+                                     is_string: false,
+                                     optional: true,
+                                     default_value: true)
       ] + rules
     end
   end

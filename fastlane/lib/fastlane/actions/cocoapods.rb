@@ -24,7 +24,15 @@ module Fastlane
         cmd << '--verbose' if params[:verbose]
         cmd << '--no-ansi' unless params[:ansi]
 
-        Actions.sh(cmd.join(' '), error_callback: params[:error_callback])
+        if params[:error_callback]
+          Actions.sh(cmd.join(' '), error_callback: lambda { |result|
+            Dir.chdir(FastlaneCore::FastlaneFolder.path) do
+              params[:error_callback].call(result)
+            end
+          })
+        else
+          Actions.sh(cmd.join(' '))
+        end
       end
 
       def self.description
@@ -84,7 +92,7 @@ module Fastlane
         ]
         # Please don't add a version parameter to the `cocoapods` action. If you need to specify a version when running
         # `cocoapods`, please start using a Gemfile and lock the version there
-        # More information https://guides.cocoapods.org/using/a-gemfile.html
+        # More information https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile
       end
 
       def self.is_supported?(platform)

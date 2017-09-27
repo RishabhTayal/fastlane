@@ -68,6 +68,17 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
+    def expire_build(app_id: nil, build_id: nil, build: nil)
+      assert_required_params(__method__, binding)
+
+      response = request(:post) do |req|
+        req.url "providers/#{team_id}/apps/#{app_id}/builds/#{build_id}/expire"
+        req.body = build.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_response(response)
+    end
+
     ##
     # @!group Groups API
     ##
@@ -100,15 +111,34 @@ module Spaceship::TestFlight
 
     def testers_for_app(app_id: nil)
       assert_required_params(__method__, binding)
-      url = "providers/#{team_id}/apps/#{app_id}/testers?limit=10000"
-      response = request(:get, url)
-      handle_response(response)
+      page_size = 40 # that's enforced by the iTC servers
+      offset = nil
+      resulting_array = []
+
+      loop do
+        url = "providers/#{team_id}/apps/#{app_id}/testers?limit=#{page_size}&sort=email&order=asc"
+        url += "&offset=#{offset}" if offset
+        response = request(:get, url)
+        result = Array(handle_response(response))
+        resulting_array += result
+        break if result.count == 0
+        offset = "#{result.last['email']}%2C#{result.last['id']}"
+      end
+      return resulting_array
     end
 
     def delete_tester_from_app(app_id: nil, tester_id: nil)
       assert_required_params(__method__, binding)
       url = "providers/#{team_id}/apps/#{app_id}/testers/#{tester_id}"
       response = request(:delete, url)
+      handle_response(response)
+    end
+
+    def search_for_tester_in_app(app_id: nil, text: nil)
+      assert_required_params(__method__, binding)
+      text = CGI.escape(text)
+      url = "providers/#{team_id}/apps/#{app_id}/testers?order=asc&search=#{text}&sort=status"
+      response = request(:get, url)
       handle_response(response)
     end
 
