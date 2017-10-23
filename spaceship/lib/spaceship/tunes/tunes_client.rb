@@ -189,6 +189,8 @@ module Spaceship
     #####################################################
 
     def applications
+      require 'pry'
+      binding.pry
       r = request(:get, 'ra/apps/manageyourapps/summary/v2')
       parse_response(r, 'data')['summaries']
     end
@@ -713,7 +715,7 @@ module Spaceship
     # so we cache it
     # @return [UserDetail] the response
     def user_detail_data
-      @_cached_user_detail_data ||= Spaceship::Tunes::UserDetail.factory(user_details_data)
+      @_cached_user_detail_data ||= Spaceship::Tunes::UserDetail.factory(user_details_data, existing_client: self)
     end
 
     #####################################################
