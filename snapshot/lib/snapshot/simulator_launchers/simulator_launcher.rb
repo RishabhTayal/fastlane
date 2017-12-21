@@ -31,7 +31,10 @@ module Snapshot
           # Break up the array of devices into chunks that can
           # be run simultaneously.
           if launcher_config.concurrent_simulators?
-            device_batches = launcher_config.devices.each_slice(default_number_of_simultaneous_simulators).to_a
+            all_devices = launcher_config.devices
+            # We have to break up the concurrent simulators by device version too, otherwise there is an error (see #10969)
+            by_simulator_version = all_devices.group_by { |d| FastlaneCore::DeviceManager.latest_simulator_version_for_device(d) }.values
+            device_batches = by_simulator_version.flat_map { |a| a.each_slice(default_number_of_simultaneous_simulators).to_a }
           else
             # Put each device in it's own array to run tests one at a time
             device_batches = launcher_config.devices.map { |d| [d] }
@@ -48,7 +51,7 @@ module Snapshot
     end
 
     def launch_simultaneously(devices, language, locale, launch_arguments)
-      prepare_for_launch(language, locale, launch_arguments)
+      prepare_for_launch(devices, language, locale, launch_arguments)
 
       add_media(devices, :photo, launcher_config.add_photos) if launcher_config.add_photos
       add_media(devices, :video, launcher_config.add_videos) if launcher_config.add_videos

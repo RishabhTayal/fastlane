@@ -2,6 +2,7 @@ require 'fastlane_core'
 require 'credentials_manager'
 
 module Deliver
+  # rubocop:disable Metrics/ClassLength
   class Options
     def self.available_options
       user = CredentialsManager::AppfileConfig.try_fetch_value(:itunes_connect_id)
@@ -111,11 +112,20 @@ module Deliver
                                      description: "Should the app be automatically released once it's approved?",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :auto_release_date,
+                                     env_name: "DELIVER_AUTO_RELEASE_DATE",
+                                     description: "Date in milliseconds for automatically releasing on pending approval",
+                                     is_string: false,
+                                     optional: true,
+                                     conflicting_options: [:automatic_release],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'auto_release_date' and '#{value.key}' options together.")
+                                     end),
         FastlaneCore::ConfigItem.new(key: :phased_release,
                                      description: "Enable the phased release feature of iTC",
                                      optional: true,
                                      is_string: false,
-                                     default_value: nil),
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :price_tier,
                                      short_option: "-r",
                                      description: "The price tier of this application",
@@ -181,10 +191,12 @@ module Deliver
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                      end),
+        # rubocop:disable Metrics/LineLength
         FastlaneCore::ConfigItem.new(key: :itc_provider,
                                      env_name: "DELIVER_ITC_PROVIDER",
-                                     description: "The provider short name to be used with the iTMSTransporter to identify your team",
+                                     description: "The provider short name to be used with the iTMSTransporter to identify your team. To get provider short name run `pathToXcode.app/Contents/Applications/Application\\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column",
                                      optional: true),
+        # rubocop:enable Metrics/LineLength
         FastlaneCore::ConfigItem.new(key: :overwrite_screenshots,
                                      env_name: "DELIVER_OVERWRITE_SCREENSHOTS",
                                      description: "Clear all previously uploaded screenshots before uploading the new ones",
@@ -252,11 +264,13 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :trade_representative_contact_information,
                                      description: "Metadata: A hash containing the trade representative contact information",
                                      optional: true,
-                                     is_string: false),
+                                     is_string: false,
+                                     type: Hash),
         FastlaneCore::ConfigItem.new(key: :app_review_information,
                                      description: "Metadata: A hash containing the review information",
                                      optional: true,
-                                     is_string: false),
+                                     is_string: false,
+                                     type: Hash),
         # Localised
         FastlaneCore::ConfigItem.new(key: :description,
                                      description: "Metadata: The localised app description",
@@ -270,6 +284,7 @@ module Deliver
                                      description: "Metadata: The localised app subtitle",
                                      optional: true,
                                      is_string: false,
+                                     type: Hash,
                                      verify_block: proc do |value|
                                        UI.user_error!(":subtitle must be a hash, with the language being the key") unless value.kind_of?(Hash)
                                      end),
@@ -277,6 +292,7 @@ module Deliver
                                      description: "Metadata: An array of localised keywords",
                                      optional: true,
                                      is_string: false,
+                                     type: Hash,
                                      verify_block: proc do |value|
                                        UI.user_error!(":keywords must be a hash, with the language being the key") unless value.kind_of?(Hash)
                                        value.each do |language, keywords|
@@ -291,6 +307,7 @@ module Deliver
                                      description: "Metadata: An array of localised promotional texts",
                                      optional: true,
                                      is_string: false,
+                                     type: Hash,
                                      verify_block: proc do |value|
                                        UI.user_error!(":keywords must be a hash, with the language being the key") unless value.kind_of?(Hash)
                                      end),
@@ -320,8 +337,15 @@ module Deliver
                                      env_name: "DELIVER_IGNORE_LANGUAGE_DIRECTORY_VALIDATION",
                                      description: "Ignore errors when invalid languages are found in metadata and screeenshot directories",
                                      default_value: false,
-                                     is_string: false)
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :precheck_include_in_app_purchases,
+                                     env_name: "PRECHECK_INCLUDE_IN_APP_PURCHASES",
+                                     description: "Should precheck check in-app purchases?",
+                                     is_string: false,
+                                     optional: true,
+                                     default_value: true)
       ]
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

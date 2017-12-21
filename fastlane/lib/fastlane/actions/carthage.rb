@@ -11,7 +11,7 @@ module Fastlane
 
         if command_name == "archive" && params[:frameworks].count > 0
           cmd.concat params[:frameworks]
-        elsif command_name == "update" && params[:dependencies].count > 0
+        elsif (command_name == "update" || command_name == "build") && params[:dependencies].count > 0
           cmd.concat params[:dependencies]
         end
 
@@ -65,7 +65,7 @@ module Fastlane
                                          UI.user_error!("Please pass a valid command. Use one of the following: #{available_commands.join(', ')}") unless available_commands.include? value
                                        end),
           FastlaneCore::ConfigItem.new(key: :dependencies,
-                                       description: "Carthage dependencies to update",
+                                       description: "Carthage dependencies to update or build",
                                        default_value: [],
                                        is_string: false,
                                        type: Array),
@@ -73,42 +73,32 @@ module Fastlane
                                        env_name: "FL_CARTHAGE_USE_SSH",
                                        description: "Use SSH for downloading GitHub repositories",
                                        is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for use_ssh. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :use_submodules,
                                        env_name: "FL_CARTHAGE_USE_SUBMODULES",
                                        description: "Add dependencies as Git submodules",
                                        is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for use_submodules. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :use_binaries,
                                        env_name: "FL_CARTHAGE_USE_BINARIES",
                                        description: "Check out dependency repositories even when prebuilt frameworks exist",
                                        is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for use_binaries. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :no_build,
                                        env_name: "FL_CARTHAGE_NO_BUILD",
                                        description: "When bootstrapping Carthage do not build",
                                        is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for no_build. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :no_skip_current,
                                        env_name: "FL_CARTHAGE_NO_SKIP_CURRENT",
                                        description: "Don't skip building the Carthage project (in addition to its dependencies)",
                                        is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for no_skip_current. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :derived_data,
                                        env_name: "FL_CARTHAGE_DERIVED_DATA",
                                        description: "Use derived data folder at path",
@@ -117,10 +107,8 @@ module Fastlane
                                        env_name: "FL_CARTHAGE_VERBOSE",
                                        description: "Print xcodebuild output inline",
                                        is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for verbose. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :platform,
                                        env_name: "FL_CARTHAGE_PLATFORM",
                                        description: "Define which platform to build for",
@@ -174,7 +162,7 @@ module Fastlane
             frameworks: ["MyFramework1", "MyFramework2"],   # Specify which frameworks to archive (only for the archive command)
             output: "MyFrameworkBundle.framework.zip",      # Specify the output archive name (only for the archive command)
             command: "bootstrap",                           # One of: build, bootstrap, update, archive. (default: bootstrap)
-            dependencies: ["Alamofire", "Notice"],          # Specify which dependencies to update (only for the update command)
+            dependencies: ["Alamofire", "Notice"],          # Specify which dependencies to update or build (only for update and build commands)
             use_ssh: false,                                 # Use SSH for downloading GitHub repositories.
             use_submodules: false,                          # Add dependencies as Git submodules.
             use_binaries: true,                             # Check out dependency repositories even when prebuilt frameworks exist

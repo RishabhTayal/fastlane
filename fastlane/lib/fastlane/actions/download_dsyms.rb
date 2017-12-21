@@ -5,6 +5,7 @@ module Fastlane
     end
 
     class DownloadDsymsAction < Action
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         require 'spaceship'
         require 'net/http'
@@ -29,8 +30,12 @@ module Fastlane
         # Set version if it is latest
         if version == 'latest'
           # Try to grab the edit version first, else fallback to live version
+          UI.message("Looking for latest version...")
           latest_version = app.edit_version(platform: platform) || app.live_version(platform: platform)
-          version = nil
+
+          UI.user_error!("Could not find latest version for your app, please try setting a specific version") if latest_version.version.nil?
+
+          version = latest_version.version
           build_number = latest_version.build_version
         end
 
@@ -57,7 +62,9 @@ module Fastlane
             end
 
             begin
-              download_url = build.details.dsym_url
+              # need to call reload here or dsym_url is nil
+              build.reload
+              download_url = build.dsym_url
             rescue Spaceship::TunesClient::ITunesConnectError => ex
               UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
             end
@@ -80,6 +87,7 @@ module Fastlane
           UI.error("No dSYM files found on iTunes Connect - this usually happens when no recompling happened yet")
         end
       end
+      # rubocop:enable Metrics/PerceivedComplexity
 
       def self.write_dsym(data, bundle_id, train_number, build_number, output_directory)
         file_name = "#{bundle_id}-#{train_number}-#{build_number}.dSYM.zip"
@@ -158,8 +166,9 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :platform,
                                        short_option: "-p",
                                        env_name: "DOWNLOAD_DSYMS_PLATFORM",
-                                       description: "The app platform for dSYMs you wish to download",
-                                       optional: true),
+                                       description: "The app platform for dSYMs you wish to download (ios, appletvos)",
+                                       optional: true,
+                                       default_value: :ios),
           FastlaneCore::ConfigItem.new(key: :version,
                                        short_option: "-v",
                                        env_name: "DOWNLOAD_DSYMS_VERSION",

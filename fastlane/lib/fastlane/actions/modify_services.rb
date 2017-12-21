@@ -58,7 +58,11 @@ module Fastlane
             passbook: 'passbook',
             push_notification: 'push_notification',
             siri_kit: 'sirikit',
-            vpn_configuration: 'vpn_conf'
+            vpn_configuration: 'vpn_conf',
+            network_extension: 'network_extension',
+            hotspot: 'hotspot',
+            multipath: 'multipath',
+            nfc_tag_reading: 'nfc_tag_reading'
         }
       end
 
@@ -99,6 +103,7 @@ module Fastlane
                                        env_name: "PRODUCE_ENABLE_SERVICES",
                                        description: "Array with Spaceship App Services (e.g. #{allowed_services_description})",
                                        is_string: false,
+                                       type: Hash,
                                        default_value: {},
                                        verify_block: proc do |value|
                                          allowed_keys = Produce::DeveloperCenter::ALLOWED_SERVICES.keys
