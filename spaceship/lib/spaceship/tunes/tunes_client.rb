@@ -240,8 +240,6 @@ module Spaceship
     #####################################################
 
     def applications
-      require 'pry'
-      binding.pry
       r = request(:get, 'ra/apps/manageyourapps/summary/v2')
       parse_response(r, 'data')['summaries']
     end
