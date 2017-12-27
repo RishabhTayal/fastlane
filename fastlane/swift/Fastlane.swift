@@ -641,7 +641,7 @@ func bundleInstall(binstubs: String? = nil,
                                                                                                 RubyCommand.Argument(name: "with", value: with)])
   _ = runner.executeCommand(command)
 }
-func captureAndroidScreenshots(androidHome: String?,
+func captureAndroidScreenshots(androidHome: String? = nil,
                                buildToolsVersion: String? = nil,
                                locales: [String] = ["en-US"],
                                clearPreviousScreenshots: Bool = false,
@@ -1103,9 +1103,9 @@ func createPullRequest(apiToken: String,
                        repo: String,
                        title: String,
                        body: String? = nil,
-                       head: String?,
+                       head: String? = nil,
                        base: String = "master",
-                       apiUrl: String?) {
+                       apiUrl: String = "https://api.github.com") {
   let command = RubyCommand(commandID: "", methodName: "create_pull_request", className: nil, args: [RubyCommand.Argument(name: "api_token", value: apiToken),
                                                                                                      RubyCommand.Argument(name: "repo", value: repo),
                                                                                                      RubyCommand.Argument(name: "title", value: title),
@@ -1362,6 +1362,7 @@ func frameScreenshots(white: String? = nil,
                       forceDeviceType: String? = nil,
                       useLegacyIphone5s: Bool = false,
                       useLegacyIphone6s: Bool = false,
+                      forceOrientationBlock: String? = nil,
                       path: String = "./") {
   let command = RubyCommand(commandID: "", methodName: "frame_screenshots", className: nil, args: [RubyCommand.Argument(name: "white", value: white),
                                                                                                    RubyCommand.Argument(name: "silver", value: silver),
@@ -1370,6 +1371,7 @@ func frameScreenshots(white: String? = nil,
                                                                                                    RubyCommand.Argument(name: "force_device_type", value: forceDeviceType),
                                                                                                    RubyCommand.Argument(name: "use_legacy_iphone5s", value: useLegacyIphone5s),
                                                                                                    RubyCommand.Argument(name: "use_legacy_iphone6s", value: useLegacyIphone6s),
+                                                                                                   RubyCommand.Argument(name: "force_orientation_block", value: forceOrientationBlock),
                                                                                                    RubyCommand.Argument(name: "path", value: path)])
   _ = runner.executeCommand(command)
 }
@@ -1380,6 +1382,7 @@ func frameit(white: String? = nil,
              forceDeviceType: String? = nil,
              useLegacyIphone5s: Bool = false,
              useLegacyIphone6s: Bool = false,
+             forceOrientationBlock: String? = nil,
              path: String = "./") {
   let command = RubyCommand(commandID: "", methodName: "frameit", className: nil, args: [RubyCommand.Argument(name: "white", value: white),
                                                                                          RubyCommand.Argument(name: "silver", value: silver),
@@ -1388,6 +1391,7 @@ func frameit(white: String? = nil,
                                                                                          RubyCommand.Argument(name: "force_device_type", value: forceDeviceType),
                                                                                          RubyCommand.Argument(name: "use_legacy_iphone5s", value: useLegacyIphone5s),
                                                                                          RubyCommand.Argument(name: "use_legacy_iphone6s", value: useLegacyIphone6s),
+                                                                                         RubyCommand.Argument(name: "force_orientation_block", value: forceOrientationBlock),
                                                                                          RubyCommand.Argument(name: "path", value: path)])
   _ = runner.executeCommand(command)
 }
@@ -1494,7 +1498,7 @@ func getPushCertificate(development: Bool = false,
                         username: String,
                         teamId: String? = nil,
                         teamName: String? = nil,
-                        p12Password: String = "",
+                        p12Password: String,
                         pemName: String? = nil,
                         outputPath: String = ".",
                         newProfile: String? = nil) {
@@ -1513,13 +1517,13 @@ func getPushCertificate(development: Bool = false,
                                                                                                       RubyCommand.Argument(name: "new_profile", value: newProfile)])
   _ = runner.executeCommand(command)
 }
-func getVersionNumber(xcodeproj: String? = nil,
-                      scheme: String? = nil,
-                      target: String? = nil) {
+@discardableResult func getVersionNumber(xcodeproj: String? = nil,
+                                         scheme: String? = nil,
+                                         target: String? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "get_version_number", className: nil, args: [RubyCommand.Argument(name: "xcodeproj", value: xcodeproj),
                                                                                                     RubyCommand.Argument(name: "scheme", value: scheme),
                                                                                                     RubyCommand.Argument(name: "target", value: target)])
-  _ = runner.executeCommand(command)
+  return runner.executeCommand(command)
 }
 func gitAdd(path: String? = nil,
             pathspec: String? = nil) {
@@ -1803,7 +1807,7 @@ func importCertificate(keychainName: String,
                        keychainPath: String? = nil,
                        keychainPassword: String? = nil,
                        certificatePath: String,
-                       certificatePassword: String = "",
+                       certificatePassword: String? = nil,
                        logOutput: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "import_certificate", className: nil, args: [RubyCommand.Argument(name: "keychain_name", value: keychainName),
                                                                                                     RubyCommand.Argument(name: "keychain_path", value: keychainPath),
@@ -2154,7 +2158,7 @@ func pem(development: Bool = false,
          username: String,
          teamId: String? = nil,
          teamName: String? = nil,
-         p12Password: String = "",
+         p12Password: String,
          pemName: String? = nil,
          outputPath: String = ".",
          newProfile: String? = nil) {
@@ -2778,7 +2782,7 @@ func setupJenkins(force: Bool = false,
                   addKeychainToSearchList: String = "replace",
                   setDefaultKeychain: Bool = true,
                   keychainPath: String? = nil,
-                  keychainPassword: String = "",
+                  keychainPassword: String,
                   setCodeSigningIdentity: Bool = true,
                   codeSigningIdentity: String? = nil,
                   outputDirectory: String = "./output",
@@ -3064,7 +3068,7 @@ func ssh(username: String,
 func supply(packageName: String,
             track: String = "production",
             rollout: String? = nil,
-            metadataPath: String? = nil,
+            metadataPath: String = "./metadata",
             key: String? = nil,
             issuer: String? = nil,
             jsonKey: String? = nil,
@@ -3512,7 +3516,7 @@ func uploadToAppStore(username: String,
 func uploadToPlayStore(packageName: String,
                        track: String = "production",
                        rollout: String? = nil,
-                       metadataPath: String? = nil,
+                       metadataPath: String = "./metadata",
                        key: String? = nil,
                        issuer: String? = nil,
                        jsonKey: String? = nil,
@@ -3661,7 +3665,7 @@ func xcexport() {
                                              botName: String,
                                              integrationNumber: String? = nil,
                                              username: String = "",
-                                             password: String = "",
+                                             password: String? = nil,
                                              targetFolder: String = "./xcs_assets",
                                              keepAllAssets: Bool = false,
                                              trustSelfSignedCerts: Bool = true) -> [String] {
