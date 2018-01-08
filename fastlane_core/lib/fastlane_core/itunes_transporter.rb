@@ -1,7 +1,9 @@
-require 'pty'
 require 'shellwords'
 require 'fileutils'
 require 'credentials_manager/account_manager'
+
+require_relative 'features'
+require_relative 'helper'
 
 module FastlaneCore
   # The TransporterInputError occurs when you passed wrong inputs to the {Deliver::ItunesTransporter}
@@ -41,7 +43,7 @@ module FastlaneCore
       end
 
       begin
-        PTY.spawn(command) do |stdin, stdout, pid|
+        FastlaneCore::PTY.spawn(command) do |stdin, stdout, pid|
           begin
             stdin.each do |line|
               @all_lines << line
