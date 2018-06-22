@@ -279,6 +279,26 @@ module Supply
       end
     end
 
+    def track_version_name(track)
+      require 'pry'
+      binding.pry
+
+      ensure_active_edit!
+
+      begin
+        result = android_publisher.get_track(
+          current_package_name,
+          current_edit.id,
+          track
+        )
+        puts result
+        return result.version_name
+      rescue Google::Apis::ClientError => e
+        return [] if e.status_code == 404 && e.to_s.include?("trackEmpty")
+        raise
+      end
+    end
+
     # Get list of version codes for track
     def track_version_codes(track)
       ensure_active_edit!
